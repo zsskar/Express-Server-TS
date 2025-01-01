@@ -1,10 +1,10 @@
-import { Request, Response } from 'express';
+import { RequestHandler } from 'express';
 
-export const getAllProducts = (req: Request, res: Response) => {
+export const getAllProducts : RequestHandler = (req, res) => {
   res.send('Get all products');
 };
 
-export const getProductById = (req: Request, res: Response) => {
+export const getProductById : RequestHandler = (req, res) => {
   const { id } = req.params;
   res.send(`Get product with ID: ${id}`);
 };
