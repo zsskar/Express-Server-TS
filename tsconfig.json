@@ -8,13 +8,7 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-     "baseUrl": "./src",
-      "paths": {
-            "@controllers/*": ["controllers/*"],
-            "@db/*": ["db/*"],
-            "@schemas/*": ["schemas/*"],
-            "@routes/*": ["routes/*"]
-        }
-      },
+    "baseUrl": "./src"
+  },
   "include": ["src/**/*"]
 }
