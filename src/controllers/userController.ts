@@ -1,11 +1,11 @@
 import { RequestHandler } from 'express';
-import { createUserSchema } from '../schemas';
+import { userSchema } from '../schemas';
 import  prisma  from '../db';
 import { Prisma } from '@prisma/client';
 
 export const createUser: RequestHandler = async (req, res) => {
   try {
-    const requestBody = createUserSchema.parse(req.body);
+    const requestBody = userSchema.parse(req.body);
     const newUser = await prisma.user.create({ data: requestBody });
     res.status(201).json(newUser);
   } catch (error) {
@@ -22,7 +22,7 @@ export const createUser: RequestHandler = async (req, res) => {
 export const updateUser: RequestHandler = async (req, res) => {
   try {
     const { id } = req.params;
-    const requestBody = createUserSchema.parse(req.body);
+    const requestBody = userSchema.parse(req.body);
     const existingUser = await prisma.user.findUnique({ where: { id: Number(id) } });
     if (!existingUser) {
        res.status(404).json({ error: 'User not found' });
@@ -47,7 +47,7 @@ export const updateUser: RequestHandler = async (req, res) => {
 export const getUserById: RequestHandler = async (req, res) => {
   try {
     const { id } = req.params;
-    const user = await prisma.user.findUnique({ where: { id: Number(id) } });
+    const user = await prisma.user.findUnique({ where: { id: Number(id) }, include : { purchases : true} });
     if (!user) {
        res.status(404).json({ error: 'User not found' });
        return;
@@ -76,4 +76,36 @@ export const getAllUsers: RequestHandler = async (req, res) => {
         res.status(400).json({ error: 'Unknown error' });
       }
     }
+};
+
+export const deleteUserById: RequestHandler = async (req, res) => {
+    try {
+      const { id } = req.params;
+      const user = await prisma.user.findUnique({ where: { id: Number(id) } }); 
+      if (!user) {
+        res.status(404).json({ error: 'User not found' });
+        return;
+      }
+      await prisma.user.delete({ where: { id: Number(id) } });
+      res.json({ message: 'User deleted successfully' });
+    } catch (error) {
+      if (error instanceof Error) {
+        res.status(400).json({ error: error.message });
+      } else {
+        res.status(400).json({ error: 'Unknown error' });
+      }
+    }
+};
+
+export const deleteAllUsers : RequestHandler = async (req, res) => {
+      try {
+        prisma.user.deleteMany({});
+        res.json({ message: 'All users deleted successfully' });
+      } catch (error) {
+        if (error instanceof Error) {
+          res.status(400).json({ error: error.message });
+        } else {
+          res.status(400).json({ error: 'Unknown error' });
+        }
+      }
 };

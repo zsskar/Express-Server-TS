@@ -4,7 +4,7 @@ import { z } from "zod";
  * User schema
  */
 
-export const userSchema = z.object({
+export const createUserSchema = z.object({
   id: z.number().int().positive().optional(),
   email: z.string().email(),
   name: z.string().min(1),
@@ -14,7 +14,7 @@ export const userSchema = z.object({
   updatedAt: z.date().optional(),
 });
 
-export const createUserSchema = userSchema.omit({
+export const userSchema = createUserSchema.omit({
   id: true,
   createdAt: true,
   updatedAt: true,
@@ -24,19 +24,19 @@ export const createUserSchema = userSchema.omit({
  * Product schema
  */
 
-export const productSchema = z.object({
+export const createProductSchema = z.object({
     id: z.number().int().positive().optional(),
     name: z.string().min(1),
     description: z.string().min(1),
     quantity: z.number().int().nonnegative(),
-    colors: z.array(z.string()).optional(),
+    colors: z.string().optional(),
     price: z.number().nonnegative(),
-    discount: z.number().nonnegative().optional(),
+    discount: z.number().nonnegative().optional().default(0),
     createdAt: z.date().optional(),
     updatedAt: z.date().optional(),
   });
-  
-  export const createProductSchema = productSchema.omit({
+
+  export const productSchema = createProductSchema.omit({
     id: true,
     createdAt: true,
     updatedAt: true,
@@ -47,7 +47,7 @@ export const productSchema = z.object({
    * Purchase schema
    */
 
-  export const purchaseSchema = z.object({
+  export const createPurchaseSchema = z.object({
     id: z.number().int().positive().optional(),
     userId: z.number().int().positive(),
     productId: z.number().int().positive(),
@@ -55,7 +55,7 @@ export const productSchema = z.object({
     createdAt: z.date().optional(),
   });
   
-  export const createPurchaseSchema = purchaseSchema.omit({
+  export const purchaseSchema = createPurchaseSchema.omit({
     id: true,
     createdAt: true,
   });
