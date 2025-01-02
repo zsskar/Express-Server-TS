@@ -7,7 +7,7 @@
     "start": "pnpm run build && node dist/index.js",
     "build": "tsc",
     "dev": "ts-node-dev --respawn --transpile-only src/index.ts"
-  },
+  }, 
   "keywords": [],
   "author": "",
   "license": "ISC",
