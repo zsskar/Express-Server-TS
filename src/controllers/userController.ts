@@ -23,7 +23,7 @@ export const updateUser: RequestHandler = async (req, res) => {
   try {
     const { id } = req.params;
     const requestBody = userSchema.parse(req.body);
-    const existingUser = await prisma.user.findUnique({ where: { id: Number(id) } });
+    const existingUser = await prisma.user.findUnique({ where: { id: Number(id)}, include: { purchases : true, cart : true} });
     if (!existingUser) {
        res.status(404).json({ error: `User not found with ID ${id}` });
        return;
@@ -47,7 +47,7 @@ export const updateUser: RequestHandler = async (req, res) => {
 export const getUserById: RequestHandler = async (req, res) => {
   try {
     const { id } = req.params;
-    const user = await prisma.user.findUnique({ where: { id: Number(id) }, include : { purchases : true} });
+    const user = await prisma.user.findUnique({ where: { id: Number(id) }, include: { purchases : true, cart : true} });
     if (!user) {
        res.status(404).json({ error: `User not found with ID ${id}` });
        return;
@@ -64,7 +64,7 @@ export const getUserById: RequestHandler = async (req, res) => {
 
 export const getAllUsers: RequestHandler = async (req, res) => {
     try {
-      const allUser = await prisma.user.findMany({});
+      const allUser = await prisma.user.findMany({include: { purchases : true, cart : true}});
       if (!allUser) {
         res.status(404).json({ error: 'No user found' });
       }
