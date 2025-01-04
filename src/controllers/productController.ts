@@ -37,9 +37,9 @@ export const updateProduct : RequestHandler = async (req, res) => {
       }
 };
 
-export const getAllProducts : RequestHandler = (req, res) => {
+export const getAllProducts : RequestHandler = async (req, res) => {
     try {
-      const products = prisma.product.findMany({});
+      const products = await prisma.product.findMany({});
       if(!products) {
         res.status(404).json({ error: 'No products found' });
         return;
@@ -54,14 +54,14 @@ export const getAllProducts : RequestHandler = (req, res) => {
     }
 };
 
-export const getProductById : RequestHandler = (req, res) => {
+export const getProductById : RequestHandler = async (req, res) => {
     try {
       const { id } = req.params;
-      const product = prisma.product.findUnique({ where: { id: Number(id) } });
+      const product = await prisma.product.findUnique({ where: { id: Number(id) } });
       if(!product) {
         res.status(404).json({ error: `Product not found with ID ${id}` });
         return;
-      }
+      }      
       res.json(product);
     } catch (error) {
       if(error instanceof Error) {
