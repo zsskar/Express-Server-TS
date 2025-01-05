@@ -1,12 +1,12 @@
-import { getCartProductByIdAndUser, getCartProductsByUser, addProductToCart, deleteAllCartProductsByUser, deleteCartProductByIdAndUser } from '../controllers/cartController';
+import * as cartController from '../controllers/cartController';
 import Router from 'express';
 
 const cartRouter = Router();
 
-cartRouter.get("/:id/user/:userId", getCartProductByIdAndUser);
-cartRouter.get("/:userId", getCartProductsByUser);
-cartRouter.post("/:userId", addProductToCart);
-cartRouter.delete("/:userId", deleteCartProductByIdAndUser);
-cartRouter.delete("/:userId", deleteAllCartProductsByUser);
+cartRouter.get("/:id/user/:userId", cartController.getCartProductByIdAndUser);
+cartRouter.get("/:userId", cartController.getCartProductsByUser);
+cartRouter.post("/:userId", cartController.addProductToCart);
+cartRouter.delete("/:userId", cartController.deleteCartProductByIdAndUser);
+cartRouter.delete("/:userId", cartController.deleteAllCartProductsByUser);
 
 export default cartRouter;
