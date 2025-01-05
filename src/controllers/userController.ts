@@ -2,24 +2,19 @@ import { RequestHandler } from 'express';
 import { userSchema } from '../schemas';
 import  prisma  from '../db';
 import { Prisma } from '@prisma/client';
+import { ZodError } from 'zod';
 
-export const createUser: RequestHandler = async (req, res) => {
+export const createUser: RequestHandler = async (req, res, next) => {
   try {
     const requestBody = userSchema.parse(req.body);
     const newUser = await prisma.user.create({ data: requestBody });
     res.status(201).json(newUser);
   } catch (error) {
-    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
-      res.status(400).json({ error: 'A user with this email already exists.' });
-    } else if (error instanceof Error) {
-      res.status(400).json({ error: error.message });
-    } else {
-      res.status(400).json({ error: 'Unknown error' });
-    }
+    next(error);
   }
 };
 
-export const updateUser: RequestHandler = async (req, res) => {
+export const updateUser: RequestHandler = async (req, res, next) => {
   try {
     const { id } = req.params;
     const requestBody = userSchema.parse(req.body);
@@ -34,17 +29,11 @@ export const updateUser: RequestHandler = async (req, res) => {
     });
     res.json(updatedUser);
   } catch (error) {
-    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
-      res.status(400).json({ error: 'A user with this email already exists.' });
-    } else if (error instanceof Error) {
-      res.status(400).json({ error: error.message });
-    } else {
-      res.status(400).json({ error: 'Unknown error' });
-    }
+    next(error);
   }
 };
 
-export const getUserById: RequestHandler = async (req, res) => {
+export const getUserById: RequestHandler = async (req, res, next) => {
   try {
     const { id } = req.params;
     const user = await prisma.user.findUnique({ where: { id: Number(id) }, include: { purchases : true, cart : true} });
@@ -54,17 +43,11 @@ export const getUserById: RequestHandler = async (req, res) => {
     }
     res.json(user);
   } catch (error) {
-    if (!res.headersSent) {
-    if (error instanceof Error) {
-      res.status(400).json({ error: error.message });
-    } else {
-      res.status(400).json({ error: 'Unknown error' });
-    }
+    next(error);
   }
-}
 };
 
-export const getAllUsers: RequestHandler = async (req, res) => {
+export const getAllUsers: RequestHandler = async (req, res, next) => {
     try {
       const allUser = await prisma.user.findMany({include: { purchases : true, cart : true}});
       if (!allUser) {
@@ -72,17 +55,11 @@ export const getAllUsers: RequestHandler = async (req, res) => {
       }
       res.json(allUser);
     } catch (error) {
-      if (!res.headersSent) {
-      if (error instanceof Error) {
-        res.status(400).json({ error: error.message });
-      } else {
-        res.status(400).json({ error: 'Unknown error' });
-      }
-    }
+      next(error);
   }
 };
 
-export const deleteUserById: RequestHandler = async (req, res) => {
+export const deleteUserById: RequestHandler = async (req, res, next) => {
     try {
       const { id } = req.params;
       const user = await prisma.user.findUnique({ where: { id: Number(id) } }); 
@@ -93,27 +70,15 @@ export const deleteUserById: RequestHandler = async (req, res) => {
       await prisma.user.delete({ where: { id: Number(id) } });
       res.json({ message: 'User deleted successfully' });
     } catch (error) {
-      if (!res.headersSent) {
-      if (error instanceof Error) {
-        res.status(400).json({ error: error.message });
-      } else {
-        res.status(400).json({ error: 'Unknown error' });
-      }
-    }
+      next(error);
   }
 };
 
-export const deleteAllUsers : RequestHandler = async (req, res) => {
+export const deleteAllUsers : RequestHandler = async (req, res, next) => {
       try {
         prisma.user.deleteMany({});
         res.json({ message: 'All users deleted successfully' });
       } catch (error) {
-        if (!res.headersSent) {
-        if (error instanceof Error) {
-          res.status(400).json({ error: error.message });
-        } else {
-          res.status(400).json({ error: 'Unknown error' });
-        }
-      }
+        next(error);
     }
 };
