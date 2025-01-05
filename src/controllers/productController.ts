@@ -46,12 +46,14 @@ export const getAllProducts : RequestHandler = async (req, res) => {
       }
       res.json(products);
     } catch (error) {
+      if (!res.headersSent) {
       if(error instanceof Error) {
         res.status(400).json({ error: error.message });
       } else {
         res.status(400).json({ error: 'Unknown error' });
       }
     }
+  }
 };
 
 export const getProductById : RequestHandler = async (req, res) => {
@@ -64,11 +66,13 @@ export const getProductById : RequestHandler = async (req, res) => {
       }      
       res.json(product);
     } catch (error) {
+      if (!res.headersSent) {
       if(error instanceof Error) {
         res.status(400).json({ error: error.message });
       } else {
         res.status(400).json({ error: 'Unknown error' });
       }
+    }
     }
 };
 
@@ -85,12 +89,14 @@ export const deleteProductById : RequestHandler = async (req, res) => {
       res.json({ message: 'Product deleted successfully' });
       
     } catch (error) {
+      if (!res.headersSent) {
       if(error instanceof Error) {
         res.status(400).json({ error: error.message });
       } else {
         res.status(400).json({ error: 'Unknown error' });
       }
     }
+  }
 };
 
 export const deleteAllProducts : RequestHandler = async (req, res) => {
@@ -98,10 +104,12 @@ export const deleteAllProducts : RequestHandler = async (req, res) => {
       await prisma.product.deleteMany({});
       res.json({ message: 'All products deleted successfully' });
     } catch (error) {
+      if (!res.headersSent) {
       if(error instanceof Error) {
         res.status(400).json({ error: error.message });
       } else {
         res.status(400).json({ error: 'Unknown error' });
     }
   }
+}
 };

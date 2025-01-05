@@ -54,12 +54,14 @@ export const getUserById: RequestHandler = async (req, res) => {
     }
     res.json(user);
   } catch (error) {
+    if (!res.headersSent) {
     if (error instanceof Error) {
       res.status(400).json({ error: error.message });
     } else {
       res.status(400).json({ error: 'Unknown error' });
     }
   }
+}
 };
 
 export const getAllUsers: RequestHandler = async (req, res) => {
@@ -70,12 +72,14 @@ export const getAllUsers: RequestHandler = async (req, res) => {
       }
       res.json(allUser);
     } catch (error) {
+      if (!res.headersSent) {
       if (error instanceof Error) {
         res.status(400).json({ error: error.message });
       } else {
         res.status(400).json({ error: 'Unknown error' });
       }
     }
+  }
 };
 
 export const deleteUserById: RequestHandler = async (req, res) => {
@@ -89,12 +93,14 @@ export const deleteUserById: RequestHandler = async (req, res) => {
       await prisma.user.delete({ where: { id: Number(id) } });
       res.json({ message: 'User deleted successfully' });
     } catch (error) {
+      if (!res.headersSent) {
       if (error instanceof Error) {
         res.status(400).json({ error: error.message });
       } else {
         res.status(400).json({ error: 'Unknown error' });
       }
     }
+  }
 };
 
 export const deleteAllUsers : RequestHandler = async (req, res) => {
@@ -102,10 +108,12 @@ export const deleteAllUsers : RequestHandler = async (req, res) => {
         prisma.user.deleteMany({});
         res.json({ message: 'All users deleted successfully' });
       } catch (error) {
+        if (!res.headersSent) {
         if (error instanceof Error) {
           res.status(400).json({ error: error.message });
         } else {
           res.status(400).json({ error: 'Unknown error' });
         }
       }
+    }
 };

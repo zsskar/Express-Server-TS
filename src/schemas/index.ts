@@ -68,3 +68,19 @@ export const createProductSchema = z.object({
     id: true,
     purchaseAt: true,
   });
+
+
+  /**
+   * Cart schema
+   */
+
+  export const createCartSchema = z.object({
+    id : z.number().int().positive().optional(),
+    userId : z.number().int().positive(),
+    productId : z.number().int().positive(),
+    quantity : z.number().int().positive().default(1),    
+  });
+
+  export const cartSchema = createCartSchema.omit({
+    id: true,
+  });

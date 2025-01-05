@@ -26,12 +26,14 @@ export const getAllPurchasesByUser : RequestHandler = async (req, res) => {
         } 
         res.json(purchases);
     } catch (error) {
+         if (!res.headersSent) {
         if(error instanceof Error) {
             res.status(400).json({ error: error.message });
         } else {
             res.status(400).json({ error: 'Unknown error' });
         }           
     }
+}
 };
 
 export const getPurchaseByIdAndUser : RequestHandler = async (req, res) => {
@@ -43,10 +45,12 @@ export const getPurchaseByIdAndUser : RequestHandler = async (req, res) => {
         }   
         res.json(userPurchase);
     } catch (error) {
+        if (!res.headersSent) {
         if(error instanceof Error) {
             res.status(400).json({ error: error.message });
         } else {
             res.status(400).json({ error: 'Unknown error' });
-        }        
+        }    
+    }    
     }
 };
