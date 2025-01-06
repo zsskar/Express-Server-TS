@@ -1,8 +1,6 @@
 import { RequestHandler } from 'express';
 import { userSchema } from '../schemas';
 import  prisma  from '../db';
-import { Prisma } from '@prisma/client';
-import { ZodError } from 'zod';
 
 export const createUser: RequestHandler = async (req, res, next) => {
   try {
