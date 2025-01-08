@@ -6,8 +6,13 @@ export const rootPathMsg = {
       baseUrl: '/api/users',
       extendToBaseUrl: [
         {
-          name: 'createUser',
-          url: '',
+          name: 'Signup',
+          url: '/signup',
+          method: 'POST',
+        },
+        {
+          name: 'Signin',
+          url: '/signin',
           method: 'POST',
         },
         {
