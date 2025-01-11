@@ -11,5 +11,4 @@ routes.use('/products', productRouter);
 routes.use('/purchases', purchaseRouter);
 routes.use('/cart', cartRouter);
 
-
 export default routes;
