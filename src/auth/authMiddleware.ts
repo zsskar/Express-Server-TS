@@ -11,9 +11,11 @@ export const authMiddleware = async (
   next: NextFunction,
 ) => {
   const { userId } = req.params;
+  console.log(userId);
+
   const authHeader = req.headers.authorization;
 
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+  if (!authHeader || !authHeader.startsWith('Bearer')) {
     res.status(401).json({ message: 'Token not found' });
     return;
   }
@@ -24,6 +26,8 @@ export const authMiddleware = async (
     const isUserExists = await prisma.user.findUnique({
       where: { id: Number(userId) },
     });
+
+    console.log('User exists', isUserExists);
 
     if (!isUserExists) {
       res.status(404).json({ message: 'User not found' });

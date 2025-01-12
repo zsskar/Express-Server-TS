@@ -18,18 +18,18 @@ export const createUser: RequestHandler = async (req, res, next) => {
 
 export const updateUser: RequestHandler = async (req, res, next) => {
   try {
-    const { id } = req.params;
+    const { userId } = req.params;
     const requestBody = userSchema.parse(req.body);
     const existingUser = await prisma.user.findUnique({
-      where: { id: Number(id) },
+      where: { id: Number(userId) },
       include: { purchases: true, cart: true },
     });
     if (!existingUser) {
-      res.status(404).json({ error: `User not found with ID ${id}` });
+      res.status(404).json({ error: `User not found with ID ${userId}` });
       return;
     }
     const updatedUser = await prisma.user.update({
-      where: { id: Number(id) },
+      where: { id: Number(userId) },
       data: requestBody,
     });
     res.json(updatedUser);
@@ -38,15 +38,66 @@ export const updateUser: RequestHandler = async (req, res, next) => {
   }
 };
 
+export const updatePassword: RequestHandler = async (req, res, next) => {
+  try {
+    const { userId } = req.params;
+    const { oldPassword, confirmOldPassword, newPassword } = req.body;
+
+    // Validate request body
+    if (!oldPassword || !confirmOldPassword || !newPassword) {
+      res.status(400).json({ message: 'All password fields are required.' });
+    }
+
+    if (oldPassword !== confirmOldPassword) {
+      res.status(400).json({
+        message: 'Old password and confirm old password do not match.',
+      });
+    }
+
+    if (oldPassword === newPassword) {
+      res.status(400).json({
+        message: 'Old and new passwords must not be the same.',
+      });
+    }
+
+    // Find the user by ID
+    const user = await prisma.user.findUnique({
+      where: { id: Number(userId) },
+    });
+
+    if (!user) {
+      res.status(404).json({ message: 'User not found.' });
+      return;
+    }
+
+    // Validate old password
+    const isOldPasswordValid = await bcrypt.compare(oldPassword, user.password);
+    if (!isOldPasswordValid) {
+      res.status(403).json({ message: 'Old password is incorrect.' });
+    }
+
+    // Hash and update the new password
+    const newEncryptedPassword = await bcrypt.hash(newPassword, 10);
+    await prisma.user.update({
+      where: { id: Number(userId) },
+      data: { password: newEncryptedPassword },
+    });
+
+    res.status(200).json({ message: 'Password updated successfully.' });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const getUserById: RequestHandler = async (req, res, next) => {
   try {
-    const { id } = req.params;
+    const { userId } = req.params;
     const user = await prisma.user.findUnique({
-      where: { id: Number(id) },
+      where: { id: Number(userId) },
       include: { purchases: true, cart: true },
     });
     if (!user) {
-      res.status(404).json({ error: `User not found with ID ${id}` });
+      res.status(404).json({ error: `User not found with ID ${userId}` });
       return;
     }
     res.json(user);
@@ -71,13 +122,15 @@ export const getAllUsers: RequestHandler = async (_, res, next) => {
 
 export const deleteUserById: RequestHandler = async (req, res, next) => {
   try {
-    const { id } = req.params;
-    const user = await prisma.user.findUnique({ where: { id: Number(id) } });
+    const { userId } = req.params;
+    const user = await prisma.user.findUnique({
+      where: { id: Number(userId) },
+    });
     if (!user) {
-      res.status(404).json({ error: `User not found with ID ${id}` });
+      res.status(404).json({ error: `User not found with ID ${userId}` });
       return;
     }
-    await prisma.user.delete({ where: { id: Number(id) } });
+    await prisma.user.delete({ where: { id: Number(userId) } });
     res.json({ message: 'User deleted successfully' });
   } catch (error) {
     next(error);
@@ -108,7 +161,7 @@ export const loginUser: RequestHandler = async (req, res, next) => {
     }
 
     const token = jwt.sign({ id: user.email }, process.env.JWT_SECRET!, {
-      expiresIn: '30m',
+      expiresIn: '60m',
     });
 
     res.json({ message: 'Signin successfull', user: user, token: token });
