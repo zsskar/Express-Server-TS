@@ -13,6 +13,7 @@ userRouter.post(
   authMiddleware,
   userController.updatePassword,
 );
+userRouter.post('/checkForEmail', userController.checkIsEmailExist);
 userRouter.put('/:userId', authMiddleware, userController.updateUser);
 userRouter.delete('/:userId', authMiddleware, userController.deleteUserById);
 userRouter.delete('/', authMiddleware, userController.deleteAllUsers);

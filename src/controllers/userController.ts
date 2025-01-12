@@ -89,6 +89,26 @@ export const updatePassword: RequestHandler = async (req, res, next) => {
   }
 };
 
+export const checkIsEmailExist: RequestHandler = async (req, res, next) => {
+  try {
+    const { email } = req.body;
+    if (!email) {
+      res.status(400).json({ message: 'Email is required.' });
+    }
+    const IsEmailExist = await prisma.user.findUnique({
+      where: { email: email },
+    });
+    if (IsEmailExist) {
+      res
+        .status(200)
+        .json({ message: `This email ${email} is already exists.` });
+    }
+    res.status(404).json({ message: `Yuhu you can use this email ${email}.` });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const getUserById: RequestHandler = async (req, res, next) => {
   try {
     const { userId } = req.params;
