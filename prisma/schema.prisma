@@ -17,6 +17,7 @@ model User {
   updatedAt DateTime   @updatedAt
   purchases Purchase[]
   cart      Cart[]
+  Wishlist Wishlist[]
 }
 
 model Product {
@@ -31,6 +32,7 @@ model Product {
   updatedAt   DateTime   @updatedAt
   purchase    Purchase[]
   cart        Cart[]
+  Wishlist    Wishlist[]
 }
 
 model Purchase {
@@ -50,4 +52,14 @@ model Cart {
   product   Product @relation(fields: [productId], references: [id])
   productId Int
   quantity  Int     @default(1)
+  createdAt DateTime @default(now())
+}
+
+model Wishlist {
+  id        Int     @id @default(autoincrement())
+  user      User    @relation(fields: [userId], references: [id])
+  userId    Int
+  product   Product @relation(fields: [productId], references: [id])
+  productId Int
+  createdAt DateTime @default(now())
 }
