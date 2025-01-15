@@ -34,12 +34,26 @@ export const updateProduct: RequestHandler = async (req, res, next) => {
 
 export const getAllProducts: RequestHandler = async (req, res, next) => {
   try {
-    const products = await prisma.product.findMany({});
-    if (!products) {
+    const { limit, offset } = req.query;
+    const limitValue = limit ? Number(limit) : undefined;
+    const offsetValue = offset ? Number(offset) : undefined;
+
+    const products = await prisma.product.findMany({
+      take: limitValue,
+      skip: offsetValue,
+    });
+    if (!products || products.length === 0) {
       res.status(404).json({ error: 'No products found' });
       return;
     }
-    res.json(products);
+    res.json({
+      success: true,
+      data: products,
+      paginationInfo: {
+        limit: limitValue || null,
+        offset: offsetValue || null,
+      },
+    });
   } catch (error) {
     next(error);
   }
