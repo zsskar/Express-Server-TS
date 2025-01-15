@@ -2,21 +2,17 @@ import { RequestHandler } from 'express';
 import { purchaseSchema } from '../schemas';
 import prisma from '../db';
 
-export const createPurchase: RequestHandler = async (req, res) => {
+export const createPurchase: RequestHandler = async (req, res, next) => {
   try {
     const requestBody = purchaseSchema.parse(req.body);
     const newProduct = await prisma.purchase.create({ data: requestBody });
     res.status(201).json(newProduct);
   } catch (error) {
-    if (error instanceof Error) {
-      res.status(400).json({ error: error.message });
-    } else {
-      res.status(400).json({ error: 'Unknown error' });
-    }
+    next(error);
   }
 };
 
-export const getAllPurchasesByUser: RequestHandler = async (req, res) => {
+export const getAllPurchasesByUser: RequestHandler = async (req, res, next) => {
   try {
     const { userId } = req.params;
     const { limit, offset } = req.query;
@@ -40,17 +36,15 @@ export const getAllPurchasesByUser: RequestHandler = async (req, res) => {
       },
     });
   } catch (error) {
-    if (!res.headersSent) {
-      if (error instanceof Error) {
-        res.status(400).json({ error: error.message });
-      } else {
-        res.status(400).json({ error: 'Unknown error' });
-      }
-    }
+    next(error);
   }
 };
 
-export const getPurchaseByIdAndUser: RequestHandler = async (req, res) => {
+export const getPurchaseByIdAndUser: RequestHandler = async (
+  req,
+  res,
+  next,
+) => {
   try {
     const { id, userId } = req.params;
     const userPurchase = await prisma.purchase.findUnique({
@@ -61,12 +55,6 @@ export const getPurchaseByIdAndUser: RequestHandler = async (req, res) => {
     }
     res.json(userPurchase);
   } catch (error) {
-    if (!res.headersSent) {
-      if (error instanceof Error) {
-        res.status(400).json({ error: error.message });
-      } else {
-        res.status(400).json({ error: 'Unknown error' });
-      }
-    }
+    next(error);
   }
 };
