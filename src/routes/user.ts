@@ -1,7 +1,8 @@
-import { upload } from 'utils/multerConfig';
+import { multerUpload } from 'utils/multerConfig';
 import { authMiddleware } from '../auth/authMiddleware';
 import * as userController from '../controllers/userController';
 import { Router } from 'express';
+import { imageUtils } from 'utils/fileAllowedTypes';
 
 const userRouter = Router();
 
@@ -17,7 +18,11 @@ userRouter.post(
 userRouter.post(
   '/updateProfile/:userId',
   authMiddleware,
-  upload.single('profilePic'),
+  multerUpload(
+    imageUtils.path,
+    imageUtils.allowedTypes,
+    imageUtils.errorMsg,
+  ).single('profilePic'),
   userController.updateProfile,
 );
 userRouter.post('/checkForEmail', userController.checkIsEmailExist);
