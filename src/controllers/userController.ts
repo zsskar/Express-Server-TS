@@ -5,7 +5,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import path from 'path';
 import fs from 'fs';
-import { getFileUrl, getProfilePicPath } from '../utils/getPaths';
+import { getFileUrl, getProfilePicPath } from '../utils/paths';
 
 export const createUser: RequestHandler = async (req, res, next) => {
   try {
