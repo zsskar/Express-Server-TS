@@ -189,3 +189,18 @@ export const loginUser: RequestHandler = async (req, res, next) => {
     next(error);
   }
 };
+
+export const updateProfile: RequestHandler = async (req, res, next) => {
+  try {
+    const { userId } = req.params;
+    const existingUser = await prisma.user.findUnique({
+      where: { id: Number(userId) },
+    });
+    if (!existingUser) {
+      res.status(404).json({ error: `User not found with ID ${userId}` });
+      return;
+    }
+  } catch (error) {
+    next(error);
+  }
+};
