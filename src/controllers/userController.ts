@@ -3,6 +3,9 @@ import { userSchema } from '../schemas';
 import prisma from '../db';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import path from 'path';
+import fs from 'fs';
+import { getFileUrl } from '../utils/getFileUrl';
 
 export const createUser: RequestHandler = async (req, res, next) => {
   try {
@@ -193,6 +196,8 @@ export const loginUser: RequestHandler = async (req, res, next) => {
 export const updateProfile: RequestHandler = async (req, res, next) => {
   try {
     const { userId } = req.params;
+
+    // Check if user exists
     const existingUser = await prisma.user.findUnique({
       where: { id: Number(userId) },
     });
@@ -200,7 +205,41 @@ export const updateProfile: RequestHandler = async (req, res, next) => {
       res.status(404).json({ error: `User not found with ID ${userId}` });
       return;
     }
+
+    // Validate file presence
+    if (!req.file) {
+      res.status(400).json({ error: 'No file uploaded' });
+      return;
+    }
+
+    // Construct file path
+    const profilePicPath = path.posix.join(
+      'uploads/profile-pictures',
+      req.file.filename,
+    );
+
+    if (existingUser.profile) {
+      const oldFilePath = path.join(__dirname, '../', existingUser.profile);
+      if (fs.existsSync(oldFilePath)) {
+        fs.unlinkSync(oldFilePath);
+      }
+    }
+
+    // Update user in the database
+    const updatedUser = await prisma.user.update({
+      where: { id: Number(userId) },
+      data: { profile: profilePicPath },
+    });
+
+    // Send success response
+    res.json({
+      message: 'Profile picture updated successfully',
+      user: {
+        ...updatedUser,
+        profilePicUrl: getFileUrl(req, profilePicPath), // Generate the file URL
+      },
+    });
   } catch (error) {
-    next(error);
+    next(error); // Forward error to centralized error handler
   }
 };

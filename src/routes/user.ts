@@ -1,8 +1,8 @@
-import { multerUpload } from 'utils/multerConfig';
+import { multerUpload } from '../utils/multerConfig';
 import { authMiddleware } from '../auth/authMiddleware';
 import * as userController from '../controllers/userController';
 import { Router } from 'express';
-import { imageUtils } from 'utils/fileAllowedTypes';
+import { imageUtils } from '../utils/fileAllowedTypes';
 
 const userRouter = Router();
 

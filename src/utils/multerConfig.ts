@@ -8,8 +8,9 @@ export const multerUpload = (
 ) => {
   const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-      const uploadDir = path.join(__dirname, `uploads/${filePath}`);
-      cb(null, uploadDir); // Upload directory
+      const uploadDir = path.join(__dirname, `../uploads/${filePath}`);
+
+      cb(null, uploadDir);
     },
     filename: (req, file, cb) => {
       const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
