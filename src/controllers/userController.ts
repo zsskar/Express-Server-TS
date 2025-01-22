@@ -5,7 +5,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import path from 'path';
 import fs from 'fs';
-import { getFileUrl } from '../utils/getFileUrl';
+import { getFileUrl, getProfilePicPath } from '../utils/getPaths';
 
 export const createUser: RequestHandler = async (req, res, next) => {
   try {
@@ -123,13 +123,17 @@ export const getUserById: RequestHandler = async (req, res, next) => {
       res.status(404).json({ error: `User not found with ID ${userId}` });
       return;
     }
-    res.json(user);
+    if (user.profile) {
+      res.json({ ...user, profile: getFileUrl(req, user.profile) });
+    } else {
+      res.json(user);
+    }
   } catch (error) {
     next(error);
   }
 };
 
-export const getAllUsers: RequestHandler = async (_, res, next) => {
+export const getAllUsers: RequestHandler = async (req, res, next) => {
   try {
     const allUser = await prisma.user.findMany({
       include: { purchases: true, cart: true },
@@ -137,7 +141,11 @@ export const getAllUsers: RequestHandler = async (_, res, next) => {
     if (!allUser) {
       res.status(404).json({ error: 'No user found' });
     }
-    res.json(allUser);
+    const usersWithProfile = allUser.map((user) => ({
+      ...user,
+      profile: user.profile ? getFileUrl(req, user.profile) : null,
+    }));
+    res.json(usersWithProfile);
   } catch (error) {
     next(error);
   }
@@ -213,13 +221,10 @@ export const updateProfile: RequestHandler = async (req, res, next) => {
     }
 
     // Construct file path
-    const profilePicPath = path.posix.join(
-      'uploads/profile-pictures',
-      req.file.filename,
-    );
+    const profilePicPath = getProfilePicPath(req);
 
     if (existingUser.profile) {
-      const oldFilePath = path.join(__dirname, '../', existingUser.profile);
+      const oldFilePath = path.join(__dirname, `../${existingUser.profile}`);
       if (fs.existsSync(oldFilePath)) {
         fs.unlinkSync(oldFilePath);
       }
@@ -236,7 +241,7 @@ export const updateProfile: RequestHandler = async (req, res, next) => {
       message: 'Profile picture updated successfully',
       user: {
         ...updatedUser,
-        profilePicUrl: getFileUrl(req, profilePicPath), // Generate the file URL
+        profile: getFileUrl(req, profilePicPath),
       },
     });
   } catch (error) {
