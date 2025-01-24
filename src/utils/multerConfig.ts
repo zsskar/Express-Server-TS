@@ -28,7 +28,7 @@ export const multerUpload = (
   // Configure Multer
   const upload = multer({
     storage,
-    limits: { fileSize: 2 * 1024 * 1024 }, // 5 MB limit
+    limits: { fileSize: 2 * 1024 * 1024 }, // 2 MB limit
     fileFilter: (req, file, cb) => {
       // Validate file type
       const isValid = allowedTypes.test(
