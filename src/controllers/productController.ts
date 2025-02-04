@@ -82,6 +82,11 @@ export const getAllProducts: RequestHandler = async (req, res, next) => {
     const products = await prisma.product.findMany({
       take: limitValue,
       skip: offsetValue,
+      include: {
+        purchase: true,
+        cart: true,
+        Wishlist: true,
+      },
     });
 
     if (!products || products.length === 0) {
@@ -125,6 +130,11 @@ export const getProductById: RequestHandler = async (req, res, next) => {
     // If not cached, fetch from DB
     const product = await prisma.product.findUnique({
       where: { id: Number(id) },
+      include: {
+        purchase: true,
+        cart: true,
+        Wishlist: true,
+      },
     });
 
     if (!product) {

@@ -117,7 +117,7 @@ export const getUserById: RequestHandler = async (req, res, next) => {
     const { userId } = req.params;
     const user = await prisma.user.findUnique({
       where: { id: Number(userId) },
-      include: { purchases: true, cart: true },
+      include: { purchases: true, cart: true, Wishlist: true },
     });
     if (!user) {
       res.status(404).json({ error: `User not found with ID ${userId}` });
@@ -136,7 +136,7 @@ export const getUserById: RequestHandler = async (req, res, next) => {
 export const getAllUsers: RequestHandler = async (req, res, next) => {
   try {
     const allUser = await prisma.user.findMany({
-      include: { purchases: true, cart: true },
+      include: { purchases: true, cart: true, Wishlist: true },
     });
     if (!allUser) {
       res.status(404).json({ error: 'No user found' });
